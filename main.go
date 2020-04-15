@@ -1,3 +1,4 @@
+// An implementation of Conway's Game of Life.
 package main
 
 import (
@@ -7,47 +8,22 @@ import (
 )
 
 func main() {
-	a := randomState(188, 42)
-	//a := gliderStart(188, 42)
-
+	a := randomState(50, 150, 39)
 	printBoard(a)
 
-	//a = calculateNextBoardState(a)
-	//printBoard(a)
-
 	for {
-		time.Sleep(500 * time.Millisecond)
+		time.Sleep(250 * time.Millisecond)
 		a = calculateNextBoardState(a)
 		printBoard(a)
 	}
 }
 
-func gliderStart(w, h int) (a [][]int) {
-	var b []int
-
-	for j := 0; j < h; j++ {
-
-		for i := 0; i < w; i++ {
-			b = append(b, 0)
-		}
-
-		a = append(a, b)
-		b = []int{}
-	}
-
-	a[0][0] = 1
-	a[1][1] = 1
-	a[1][2] = 1
-	a[2][0] = 1
-	a[2][1] = 1
-
-
-	return a
-}
-
+/**
+ *	Receives a board state and calculates the next state.
+ */
 func calculateNextBoardState(b [][]int) [][]int {
 
-	u := make ([][]int, len(b))
+	u := make([][]int, len(b))
 	for e := range b {
 		u[e] = make([]int, len(b[e]))
 		copy(u[e], b[e])
@@ -62,12 +38,16 @@ func calculateNextBoardState(b [][]int) [][]int {
 	return u
 }
 
+/**
+ *	Determine the next state of a cell.
+ */
 func calculateNextCellState(y, x int, b [][]int, u [][]int) {
 
 	N := 0
 
-	for j := y-1; j <= y+1; j++ {
-		for i := x-1; i <= x+1; i++ {
+	// Count the nearest neigbors for the given cell
+	for j := y - 1; j <= y+1; j++ {
+		for i := x - 1; i <= x+1; i++ {
 			if j == -1 || i == -1 {
 				continue
 			}
@@ -83,6 +63,7 @@ func calculateNextCellState(y, x int, b [][]int, u [][]int) {
 		}
 	}
 
+	// Set the state of the cell based uppon the number of nearest neighbors
 	if b[y][x] == 1 {
 		if N < 2 {
 			u[y][x] = 0
@@ -96,6 +77,9 @@ func calculateNextCellState(y, x int, b [][]int, u [][]int) {
 	}
 }
 
+/**
+ *	Receives a board and prints it.
+ */
 func printBoard(b [][]int) {
 	fmt.Println()
 	fmt.Print(string('|'))
@@ -123,9 +107,12 @@ func printBoard(b [][]int) {
 	fmt.Println(string('|'))
 }
 
-func randomState(w, h int) (a [][]int) {
+/**
+ *	Generates a random board state of a given width and height,
+ *	and a percentage population of live cells.
+ */
+func randomState(pop, w, h int) (a [][]int) {
 	var b []int
-
 
 	for j := 0; j < h; j++ {
 
@@ -133,10 +120,9 @@ func randomState(w, h int) (a [][]int) {
 
 			s := rand.NewSource(time.Now().UnixNano())
 			r := rand.New(s)
-			//b = append(b, r.Intn(2))
-
 			rn := r.Intn(100)
-			if rn > 50 {
+
+			if rn > pop {
 				b = append(b, 1)
 			} else {
 				b = append(b, 0)
